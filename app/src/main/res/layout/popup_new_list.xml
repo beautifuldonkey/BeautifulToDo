@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#0000ff">
+
+  <EditText
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:id="@+id/new_list_name"
+    android:hint="@string/new_list_name"/>
+
+  <Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/btn_new_list_name"
+    android:text="@string/btn_done"
+    android:layout_below="@+id/new_list_name"/>
+</RelativeLayout>
