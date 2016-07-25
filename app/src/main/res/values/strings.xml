@@ -1,0 +1,4 @@
+<resources>
+  <string name="app_name">BeautifulToDo</string>
+  <string name="btn_add_list">Add List</string>
+</resources>
