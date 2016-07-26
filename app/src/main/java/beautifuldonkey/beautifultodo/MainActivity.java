@@ -16,12 +16,20 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import beautifuldonkey.beautifultodo.adapters.AdapterManager;
+import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
 
 public class MainActivity extends AppCompatActivity {
 
   Context context;
   List<NoteList> lists;
+
+  Button btnAddList;
+  NoteList newList;
+
+  View newListView;
+  PopupWindow popupWindow;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -31,22 +39,36 @@ public class MainActivity extends AppCompatActivity {
 
     lists = new ArrayList<>();
 
-    ListView noteLists = (ListView) findViewById(R.id.note_list);
+    //START TEST DATA
+    Note testNote = new Note();
+    testNote.setName("testName");
 
-    final Button btnAddList = (Button) findViewById(R.id.btn_add_list);
+    List<Note> notes = new ArrayList<>();
+    notes.add(testNote);
+
+    NoteList testNoteList = new NoteList();
+    testNoteList.setName("test note list name");
+    testNoteList.setNotes(notes);
+    lists.add(testNoteList);
+    //END TEST DATA
+
+    ListView noteLists = (ListView) findViewById(R.id.note_list);
+    ArrayAdapter<NoteList> noteListAdapter = AdapterManager.getNoteListAdapter(context,lists);
+    noteLists.setAdapter(noteListAdapter);
+
+
+    btnAddList = (Button) findViewById(R.id.btn_add_list);
     if(btnAddList != null){
       btnAddList.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
           LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-          final NoteList newList = new NoteList();
+          newList = new NoteList();
 
-
-          final View newListView = inflater.inflate(R.layout.popup_new_list,null);
-          final PopupWindow popupWindow = new PopupWindow(newListView,300,400,true);
+          newListView = inflater.inflate(R.layout.popup_new_list,null);
+          popupWindow = new PopupWindow(newListView,300,400,true);
           popupWindow.setContentView(newListView);
-
           popupWindow.showAtLocation(btnAddList, Gravity.CENTER,0,0);
 
           Button btnDoneListName = (Button) newListView.findViewById(R.id.btn_new_list_name);
