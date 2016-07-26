@@ -1,11 +1,13 @@
 package beautifuldonkey.beautifultodo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -19,6 +21,7 @@ import java.util.List;
 import beautifuldonkey.beautifultodo.adapters.AdapterManager;
 import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
+import beautifuldonkey.beautifultodo.data.TodoConstants;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,15 +50,30 @@ public class MainActivity extends AppCompatActivity {
     notes.add(testNote);
 
     NoteList testNoteList = new NoteList();
+    NoteList testNoteList2 = new NoteList();
+
     testNoteList.setName("test note list name");
     testNoteList.setNotes(notes);
+
+    testNoteList2.setName("name2");
+    testNoteList2.setNotes(notes);
+
     lists.add(testNoteList);
+    lists.add(testNoteList2);
     //END TEST DATA
 
     ListView noteLists = (ListView) findViewById(R.id.note_list);
     ArrayAdapter<NoteList> noteListAdapter = AdapterManager.getNoteListAdapter(context,lists);
-    noteLists.setAdapter(noteListAdapter);
-
+    if(noteLists != null){
+      noteLists.setAdapter(noteListAdapter);
+      noteLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+          Intent intent = new Intent(context,TodoActivity.class);
+          startActivityForResult(intent,TodoConstants.INTENT_OPEN_LIST);
+        }
+      });
+    }
 
     btnAddList = (Button) findViewById(R.id.btn_add_list);
     if(btnAddList != null){
