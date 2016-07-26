@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
   Context context;
   List<NoteList> lists;
+  ArrayAdapter<NoteList> noteListAdapter;
 
   Button btnAddList;
   NoteList newList;
@@ -58,12 +59,12 @@ public class MainActivity extends AppCompatActivity {
     testNoteList2.setName("name2");
     testNoteList2.setNotes(notes);
 
-    lists.add(testNoteList);
-    lists.add(testNoteList2);
+//    lists.add(testNoteList);
+//    lists.add(testNoteList2);
     //END TEST DATA
 
     ListView noteLists = (ListView) findViewById(R.id.note_list);
-    ArrayAdapter<NoteList> noteListAdapter = AdapterManager.getNoteListAdapter(context,lists);
+    noteListAdapter = AdapterManager.getNoteListAdapter(context,lists);
     if(noteLists != null){
       noteLists.setAdapter(noteListAdapter);
       noteLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
           newList = new NoteList();
 
           newListView = inflater.inflate(R.layout.popup_new_list,null);
-          popupWindow = new PopupWindow(newListView,300,400,true);
+          popupWindow = new PopupWindow(newListView,300,500,true);
           popupWindow.setContentView(newListView);
           popupWindow.showAtLocation(btnAddList, Gravity.CENTER,0,0);
 
@@ -96,13 +97,28 @@ public class MainActivity extends AppCompatActivity {
               TextView textListName = (TextView) newListView.findViewById(R.id.new_list_name);
               if(textListName.getText().length()>0){
                 newList.setName(textListName.getText().toString());
+                List<NoteList> existingNoteLists = new ArrayList<>();
+                if(lists.size()>0){
+                  existingNoteLists.addAll(lists.subList(0,lists.size()));
+                }
+                existingNoteLists.add(newList);
+                lists.clear();
+                lists.addAll(existingNoteLists);
+                noteListAdapter.notifyDataSetChanged();
                 popupWindow.dismiss();
               }else{
                 Toast.makeText(context,"Please enter a name for this list",Toast.LENGTH_SHORT).show();
               }
             }
           });
-          lists.add(newList);
+
+          Button btnCancel = (Button) newListView.findViewById(R.id.btn_cancel);
+          btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              popupWindow.dismiss();
+            }
+          });
         }
       });
     }
