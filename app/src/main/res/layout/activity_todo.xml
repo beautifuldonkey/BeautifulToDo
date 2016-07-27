@@ -10,4 +10,23 @@
   android:paddingTop="@dimen/activity_vertical_margin"
   tools:context="beautifuldonkey.beautifultodo.TodoActivity">
 
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/text_list_name"/>
+
+  <ListView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/list_todo_items"
+    android:layout_below="@+id/text_list_name"/>
+
+  <Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/btn_add_item"
+    android:text="@string/btn_add_item"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"/>
+
 </RelativeLayout>

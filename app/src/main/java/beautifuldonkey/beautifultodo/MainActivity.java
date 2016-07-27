@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity {
     testNoteList2.setName("name2");
     testNoteList2.setNotes(notes);
 
-//    lists.add(testNoteList);
-//    lists.add(testNoteList2);
+    lists.add(testNoteList);
+    lists.add(testNoteList2);
     //END TEST DATA
 
     ListView noteLists = (ListView) findViewById(R.id.note_list);
@@ -70,7 +70,9 @@ public class MainActivity extends AppCompatActivity {
       noteLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+          NoteList selectedList = lists.get(position);
           Intent intent = new Intent(context,TodoActivity.class);
+          intent.putExtra(TodoConstants.INTENT_EXTRA_LIST,selectedList);
           startActivityForResult(intent,TodoConstants.INTENT_OPEN_LIST);
         }
       });
