@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import beautifuldonkey.beautifultodo.R;
+import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
 
 /**
@@ -18,6 +19,24 @@ import beautifuldonkey.beautifultodo.data.NoteList;
  * Created by jaw_m on 7/25/2016.
  */
 public class AdapterManager {
+
+  public static ArrayAdapter<Note> getNoteAdapter(final Context context, final List<Note> notes){
+    ArrayAdapter<Note> adapter = new ArrayAdapter<Note>(context,R.layout.item_note,notes){
+      @Override
+      public View getView(int position, View convertView, ViewGroup parent) {
+        Note currentNote = notes.get(position);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.item_note,null);
+
+        TextView textNoteName = (TextView) view.findViewById(R.id.text_note_name);
+        textNoteName.setText(currentNote.getName());
+        textNoteName.setTextColor(Color.BLACK);
+
+        return view;
+      }
+    };
+    return adapter;
+  }
 
   public static ArrayAdapter<NoteList> getNoteListAdapter(final Context context, final List<NoteList> noteLists){
     ArrayAdapter<NoteList> adapter = new ArrayAdapter<NoteList>(context, R.layout.item_note_list, noteLists){
