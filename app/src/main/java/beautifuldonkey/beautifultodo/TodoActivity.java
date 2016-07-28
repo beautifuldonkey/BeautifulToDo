@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -22,8 +23,10 @@ import beautifuldonkey.beautifultodo.data.TodoConstants;
 
 public class TodoActivity extends AppCompatActivity {
 
+  ArrayAdapter<Note> adapterTodo;
   Button btnAddItem;
   Context context;
+  NoteList todoList;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +34,7 @@ public class TodoActivity extends AppCompatActivity {
     setContentView(R.layout.activity_todo);
     context = getApplicationContext();
 
-    NoteList todoList = getIntent().getParcelableExtra(TodoConstants.INTENT_EXTRA_LIST);
+    todoList = getIntent().getParcelableExtra(TodoConstants.INTENT_EXTRA_LIST);
 
     TextView textListName = (TextView) findViewById(R.id.text_list_name);
     if(textListName!=null){
@@ -39,7 +42,7 @@ public class TodoActivity extends AppCompatActivity {
     }
 
     ListView listTodoItems = (ListView) findViewById(R.id.list_todo_items);
-    ArrayAdapter<Note> adapterTodo = AdapterManager.getNoteAdapter(context,todoList.getNotes());
+    adapterTodo = AdapterManager.getNoteAdapter(context,todoList.getNotes());
     if(listTodoItems!=null){
       listTodoItems.setAdapter(adapterTodo);
       listTodoItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -56,7 +59,7 @@ public class TodoActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
           LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-          View view = inflater.inflate(R.layout.popup_new_item,null);
+          final View view = inflater.inflate(R.layout.popup_new_item,null);
           final PopupWindow popupWindow = new PopupWindow(view,300,500,true);
           popupWindow.setContentView(view);
           popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
@@ -73,7 +76,14 @@ public class TodoActivity extends AppCompatActivity {
           btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              popupWindow.dismiss();
+              EditText textNewItemName = (EditText) view.findViewById(R.id.new_item_name);
+              if(textNewItemName.getText()!= null){
+                Note note = new Note();
+                note.setName(textNewItemName.getText().toString());
+                todoList.getNotes().add(note);
+                adapterTodo.notifyDataSetChanged();
+                popupWindow.dismiss();
+              }
             }
           });
 
