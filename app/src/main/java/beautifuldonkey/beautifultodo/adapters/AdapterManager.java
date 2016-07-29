@@ -32,6 +32,10 @@ public class AdapterManager {
         textNoteName.setText(currentNote.getName());
         textNoteName.setTextColor(Color.BLACK);
 
+        TextView textNoteComments = (TextView) view.findViewById(R.id.text_note_comments);
+        textNoteComments.setText(currentNote.getComments());
+        textNoteComments.setTextColor(Color.BLACK);
+
         return view;
       }
     };

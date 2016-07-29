@@ -45,10 +45,20 @@ public class MainActivity extends AppCompatActivity {
 
     //START TEST DATA
     Note testNote = new Note();
+    Note testNote2 = new Note();
+    Note testNote3 = new Note();
+
     testNote.setName("testName");
+    testNote.setComments("Comment!");
+    testNote2.setName("name2");
+    testNote2.setComments("comments");
+    testNote3.setName("name3");
+    testNote3.setComments("comments2");
 
     List<Note> notes = new ArrayList<>();
     notes.add(testNote);
+    notes.add(testNote2);
+    notes.add(testNote3);
 
     NoteList testNoteList = new NoteList();
     NoteList testNoteList2 = new NoteList();
