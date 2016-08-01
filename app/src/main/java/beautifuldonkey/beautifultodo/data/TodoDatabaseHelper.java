@@ -64,6 +64,28 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
         NoteList todoList = new NoteList();
         todoList.setName(cursor.getString(0));
 
+        List<Note> notes = new ArrayList<>();
+        if(cursor.getString(1)!=null){
+
+          String[] notesString = cursor.getString(1).split("\\|");
+          for(int i=0; i < notesString.length; i++){
+            Note note = new Note();
+            String[] noteDetails = notesString[i].split("~");
+            String noteName = "";
+            String noteComments = "";
+            if(noteDetails.length>0){
+              noteName = noteDetails[0];
+              if(noteDetails.length>1){
+                noteComments = (!"".equals(noteDetails[1]) ? noteDetails[1]: "");
+              }
+            }
+            note.setName(noteName);
+            note.setComments(noteComments);
+            notes.add(note);
+          }
+        }
+
+        todoList.setNotes(notes);
         todoLists.add(todoList);
       }while (cursor.moveToNext());
     }
@@ -79,5 +101,22 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
     int count = cursor.getCount();
     cursor.close();
     return count;
+  }
+
+  public int updateTodoList(NoteList todoList){
+    SQLiteDatabase db = this.getWritableDatabase();
+    ContentValues contentValues = new ContentValues();
+
+    List<Note> notes = todoList.getNotes();
+    String stringNotes = "";
+
+    for(int i = 0; i < notes.size(); i++){
+      stringNotes += notes.get(i).getName()+"~"+(notes.get(i).getComments()!=null ? notes.get(i).getComments() : "" )+"|";
+    }
+
+    contentValues.put(COLUMN_LIST_ITEMS, stringNotes);
+
+    return db.update(TABLE_TODO, contentValues, COLUMN_LIST_NAME+"= ?",
+        new String[]{todoList.getName()});
   }
 }

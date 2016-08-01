@@ -111,4 +111,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
   }
+
+  @Override
+    protected void onResume() {
+      super.onResume();
+      List<NoteList> todoLists = new ArrayList<>();
+      if(todoDatabaseHelper.getTodoListCount()>0){
+        todoLists = todoDatabaseHelper.getAllTodoLists();
+      }
+      lists.clear();
+      lists.addAll(todoLists);
+      noteListAdapter.notifyDataSetChanged();
+  }
 }
