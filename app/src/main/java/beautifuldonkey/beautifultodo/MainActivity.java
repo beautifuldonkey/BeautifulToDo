@@ -19,19 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import beautifuldonkey.beautifultodo.adapters.AdapterManager;
-import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
 import beautifuldonkey.beautifultodo.data.TodoConstants;
+import beautifuldonkey.beautifultodo.data.TodoDatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
 
   Context context;
   List<NoteList> lists;
   ArrayAdapter<NoteList> noteListAdapter;
-
   Button btnAddList;
   NoteList newList;
-
+  TodoDatabaseHelper todoDatabaseHelper;
   View newListView;
   PopupWindow popupWindow;
 
@@ -42,36 +41,11 @@ public class MainActivity extends AppCompatActivity {
     context = getApplicationContext();
 
     lists = new ArrayList<>();
+    todoDatabaseHelper = new TodoDatabaseHelper(this);
 
-    //START TEST DATA
-    Note testNote = new Note();
-    Note testNote2 = new Note();
-    Note testNote3 = new Note();
-
-    testNote.setName("testName");
-    testNote.setComments("Comment!");
-    testNote2.setName("name2");
-    testNote2.setComments("comments");
-    testNote3.setName("name3");
-    testNote3.setComments("comments2");
-
-    List<Note> notes = new ArrayList<>();
-    notes.add(testNote);
-    notes.add(testNote2);
-    notes.add(testNote3);
-
-    NoteList testNoteList = new NoteList();
-    NoteList testNoteList2 = new NoteList();
-
-    testNoteList.setName("test note list name");
-    testNoteList.setNotes(notes);
-
-    testNoteList2.setName("name2");
-    testNoteList2.setNotes(notes);
-
-    lists.add(testNoteList);
-    lists.add(testNoteList2);
-    //END TEST DATA
+    if(todoDatabaseHelper.getTodoListCount()>0){
+      lists = todoDatabaseHelper.getAllTodoLists();
+    }
 
     ListView noteLists = (ListView) findViewById(R.id.note_list);
     noteListAdapter = AdapterManager.getNoteListAdapter(context,lists);
@@ -109,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
               TextView textListName = (TextView) newListView.findViewById(R.id.new_list_name);
               if(textListName.getText().length()>0){
                 newList.setName(textListName.getText().toString());
+                todoDatabaseHelper.addTodoList(newList);
                 List<NoteList> existingNoteLists = new ArrayList<>();
                 if(lists.size()>0){
                   existingNoteLists.addAll(lists.subList(0,lists.size()));
@@ -135,5 +110,17 @@ public class MainActivity extends AppCompatActivity {
       });
     }
 
+  }
+
+  @Override
+    protected void onResume() {
+      super.onResume();
+      List<NoteList> todoLists = new ArrayList<>();
+      if(todoDatabaseHelper.getTodoListCount()>0){
+        todoLists = todoDatabaseHelper.getAllTodoLists();
+      }
+      lists.clear();
+      lists.addAll(todoLists);
+      noteListAdapter.notifyDataSetChanged();
   }
 }

@@ -18,6 +18,7 @@ import beautifuldonkey.beautifultodo.adapters.AdapterManager;
 import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
 import beautifuldonkey.beautifultodo.data.TodoConstants;
+import beautifuldonkey.beautifultodo.data.TodoDatabaseHelper;
 
 public class TodoActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class TodoActivity extends AppCompatActivity {
   Integer initialItemHeight;
   ListView listTodoItems;
   NoteList todoList;
+  TodoDatabaseHelper todoDatabaseHelper;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class TodoActivity extends AppCompatActivity {
     context = getApplicationContext();
 
     todoList = getIntent().getParcelableExtra(TodoConstants.INTENT_EXTRA_LIST);
+    todoDatabaseHelper = new TodoDatabaseHelper(this);
 
     TextView textListName = (TextView) findViewById(R.id.text_list_name);
     if(textListName!=null){
@@ -93,6 +96,7 @@ public class TodoActivity extends AppCompatActivity {
                 todoList.getNotes().add(note);
                 adapterTodo.notifyDataSetChanged();
                 popupWindow.dismiss();
+                todoDatabaseHelper.updateTodoList(todoList);
               }
             }
           });
