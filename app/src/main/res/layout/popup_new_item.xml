@@ -7,15 +7,22 @@
   <EditText
     android:layout_width="100dp"
     android:layout_height="wrap_content"
-    android:id="@+id/new_item_name"
-    android:hint="@string/new_list_name"/>
+    android:id="@+id/new_note_name"
+    android:hint="@string/new_note_name"/>
+
+  <EditText
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/new_note_comments"
+    android:hint="@string/new_note_comments"
+    android:layout_below="@+id/new_note_name"/>
 
   <Button
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/btn_done"
     android:text="@string/btn_done"
-    android:layout_below="@+id/new_item_name"/>
+    android:layout_below="@+id/new_note_comments"/>
 
   <Button
     android:layout_width="wrap_content"

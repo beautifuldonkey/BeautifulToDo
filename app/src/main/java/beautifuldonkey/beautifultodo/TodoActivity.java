@@ -73,7 +73,7 @@ public class TodoActivity extends AppCompatActivity {
         public void onClick(View v) {
           LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
           final View view = inflater.inflate(R.layout.popup_new_item,null);
-          final PopupWindow popupWindow = new PopupWindow(view,300,500,true);
+          final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
           popupWindow.setContentView(view);
           popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
 
@@ -89,10 +89,14 @@ public class TodoActivity extends AppCompatActivity {
           btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              EditText textNewItemName = (EditText) view.findViewById(R.id.new_item_name);
+              EditText textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
+              EditText textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
               if(textNewItemName.getText()!= null){
                 Note note = new Note();
                 note.setName(textNewItemName.getText().toString());
+                if(!"".equals(textNewItemComments.getText().toString())){
+                  note.setComments(textNewItemComments.getText().toString());
+                }
                 todoList.getNotes().add(note);
                 adapterTodo.notifyDataSetChanged();
                 popupWindow.dismiss();
