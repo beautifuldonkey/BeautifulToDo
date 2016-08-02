@@ -8,4 +8,13 @@
     android:layout_height="wrap_content"
     android:id="@+id/list_name"/>
 
+  <Button
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/btn_remove_list"
+    android:text="X"
+    android:focusable="false"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentEnd="true"/>
+
 </RelativeLayout>

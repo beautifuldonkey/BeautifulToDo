@@ -1,7 +1,9 @@
 package beautifuldonkey.beautifultodo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     lists = new ArrayList<>();
     todoDatabaseHelper = new TodoDatabaseHelper(this);
+    registerReceiver(receiver,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
 
     if(todoDatabaseHelper.getTodoListCount()>0){
       lists = todoDatabaseHelper.getAllTodoLists();
@@ -84,14 +87,7 @@ public class MainActivity extends AppCompatActivity {
               if(textListName.getText().length()>0){
                 newList.setName(textListName.getText().toString());
                 todoDatabaseHelper.addTodoList(newList);
-                List<NoteList> existingNoteLists = new ArrayList<>();
-                if(lists.size()>0){
-                  existingNoteLists.addAll(lists.subList(0,lists.size()));
-                }
-                existingNoteLists.add(newList);
-                lists.clear();
-                lists.addAll(existingNoteLists);
-                noteListAdapter.notifyDataSetChanged();
+                updateTodoLists();
                 popupWindow.dismiss();
               }else{
                 Toast.makeText(context,"Please enter a name for this list",Toast.LENGTH_SHORT).show();
@@ -113,14 +109,25 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override
-    protected void onResume() {
-      super.onResume();
-      List<NoteList> todoLists = new ArrayList<>();
-      if(todoDatabaseHelper.getTodoListCount()>0){
-        todoLists = todoDatabaseHelper.getAllTodoLists();
-      }
-      lists.clear();
-      lists.addAll(todoLists);
-      noteListAdapter.notifyDataSetChanged();
+  protected void onResume() {
+    super.onResume();
+    updateTodoLists();
+  }
+
+  private BroadcastReceiver receiver = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      updateTodoLists();
+    }
+  };
+
+  private void updateTodoLists(){
+    List<NoteList> todoLists = new ArrayList<>();
+    if(todoDatabaseHelper.getTodoListCount()>0){
+      todoLists = todoDatabaseHelper.getAllTodoLists();
+    }
+    lists.clear();
+    lists.addAll(todoLists);
+    noteListAdapter.notifyDataSetChanged();
   }
 }

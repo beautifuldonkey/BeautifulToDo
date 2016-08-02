@@ -50,7 +50,10 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
     db.close();
   }
 
-  public void deleteTodoList(String name){}
+  public void deleteTodoList(String name){
+    SQLiteDatabase db = this.getWritableDatabase();
+    db.delete(TABLE_TODO,COLUMN_LIST_NAME+"= ?",new String[]{name});
+  }
 
   public List<NoteList> getAllTodoLists(){
     List<NoteList> todoLists = new ArrayList<>();
@@ -96,8 +99,8 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
 
   public int getTodoListCount() {
     String query = "SELECT * FROM "+TABLE_TODO;
-    SQLiteDatabase adventureDb = this.getReadableDatabase();
-    Cursor cursor = adventureDb.rawQuery(query, null);
+    SQLiteDatabase db = this.getReadableDatabase();
+    Cursor cursor = db.rawQuery(query, null);
     int count = cursor.getCount();
     cursor.close();
     return count;
