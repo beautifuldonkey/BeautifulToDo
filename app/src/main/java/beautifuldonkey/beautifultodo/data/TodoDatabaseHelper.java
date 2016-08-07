@@ -45,7 +45,17 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
   public void addTodoList(NoteList todoList){
     SQLiteDatabase db = this.getWritableDatabase();
     ContentValues contentValues = new ContentValues();
+
+    List<Note> notes = todoList.getNotes();
+    String stringNotes = "";
+
+    for(int i = 0; i < notes.size(); i++){
+      stringNotes += notes.get(i).getName()+"~"+(notes.get(i).getComments()!=null ? notes.get(i).getComments() : "" )+"|";
+    }
+
     contentValues.put(COLUMN_LIST_NAME,todoList.getName());
+    contentValues.put(COLUMN_LIST_ITEMS, stringNotes);
+
     db.insert(TABLE_TODO,null,contentValues);
     db.close();
   }

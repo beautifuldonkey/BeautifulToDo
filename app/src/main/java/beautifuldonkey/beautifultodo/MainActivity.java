@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
   TodoDatabaseHelper todoDatabaseHelper;
   View newListView;
   PopupWindow popupWindow;
+  String existingName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
     lists = new ArrayList<>();
     todoDatabaseHelper = new TodoDatabaseHelper(this);
-    registerReceiver(receiver,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
+    registerReceiver(receiverRefreshLists,new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateTodoList,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
 
     if(todoDatabaseHelper.getTodoListCount()>0){
       lists = todoDatabaseHelper.getAllTodoLists();
@@ -70,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
       btnAddList.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          openPopup();
+          openPopup(null);
         }
       });
     }
@@ -83,9 +87,15 @@ public class MainActivity extends AppCompatActivity {
     updateTodoLists();
   }
 
-  private void openPopup(){
+  private void openPopup(@Nullable final NoteList listToUpdate){
     LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     newList = new NoteList();
+
+    existingName = "";
+    if(listToUpdate!=null){
+      newList = listToUpdate;
+      existingName = listToUpdate.getName();
+    }
 
     newListView = inflater.inflate(R.layout.popup_new_list,null);
     popupWindow = new PopupWindow(newListView,300,500,true);
@@ -99,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
         TextView textListName = (TextView) newListView.findViewById(R.id.new_list_name);
         if(textListName.getText().length()>0){
           newList.setName(textListName.getText().toString());
+          if(listToUpdate!=null){
+            todoDatabaseHelper.deleteTodoList(existingName);
+          }
           todoDatabaseHelper.addTodoList(newList);
           updateTodoLists();
           popupWindow.dismiss();
@@ -117,10 +130,18 @@ public class MainActivity extends AppCompatActivity {
     });
   }
 
-  private BroadcastReceiver receiver = new BroadcastReceiver() {
+  private BroadcastReceiver receiverRefreshLists = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
       updateTodoLists();
+    }
+  };
+
+  private BroadcastReceiver receiverUpdateTodoList = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      NoteList listToUpdate = intent.getParcelableExtra("ExistingNote");
+      openPopup(listToUpdate);
     }
   };
 
