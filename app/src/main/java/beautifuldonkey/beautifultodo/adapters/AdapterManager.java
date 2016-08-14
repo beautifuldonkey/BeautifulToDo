@@ -29,7 +29,7 @@ public class AdapterManager {
   public static ArrayAdapter<Note> getNoteAdapter(final Context context, final List<Note> notes){
     ArrayAdapter<Note> adapter = new ArrayAdapter<Note>(context,R.layout.item_note,notes){
       @Override
-      public View getView(int position, View convertView, ViewGroup parent) {
+      public View getView(final int position, View convertView, ViewGroup parent) {
         Note currentNote = notes.get(position);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.item_note,null);
@@ -41,6 +41,26 @@ public class AdapterManager {
         TextView textNoteComments = (TextView) view.findViewById(R.id.text_comments);
         textNoteComments.setText(currentNote.getComments());
         textNoteComments.setTextColor(Color.BLACK);
+
+        Button btnDeleteNote = (Button) view.findViewById(R.id.btn_remove);
+        btnDeleteNote.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            notes.remove(position);
+            Intent intent = new Intent(TodoConstants.INTENT_EXTRA_REFRESH_LIST);
+            context.sendBroadcast(intent);
+          }
+        });
+
+        ImageButton btnUpdateNote = (ImageButton) view.findViewById(R.id.btn_edit);
+        btnUpdateNote.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+            Intent intent = new Intent(TodoConstants.INTENT_EXTRA_UPDATE_LIST);
+            intent.putExtra("ExistingNote", notes.get(position));
+            context.sendBroadcast(intent);
+          }
+        });
 
         return view;
       }

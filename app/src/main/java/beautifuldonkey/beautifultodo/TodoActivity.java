@@ -1,6 +1,10 @@
 package beautifuldonkey.beautifultodo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -30,6 +34,9 @@ public class TodoActivity extends AppCompatActivity {
   NoteList todoList;
   TodoDatabaseHelper todoDatabaseHelper;
 
+  EditText textNewItemName;
+  EditText textNewItemComments;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -38,6 +45,9 @@ public class TodoActivity extends AppCompatActivity {
 
     todoList = getIntent().getParcelableExtra(TodoConstants.INTENT_EXTRA_LIST);
     todoDatabaseHelper = new TodoDatabaseHelper(this);
+
+    registerReceiver(receiverRefreshNotes, new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateNote, new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
 
     TextView textListName = (TextView) findViewById(R.id.text_list_name);
     if(textListName!=null){
@@ -71,43 +81,83 @@ public class TodoActivity extends AppCompatActivity {
       btnAddItem.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-          final View view = inflater.inflate(R.layout.popup_new_item,null);
-          final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
-          popupWindow.setContentView(view);
-          popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
-
-          Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
-          btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              popupWindow.dismiss();
-            }
-          });
-
-          Button btnDone = (Button) view.findViewById(R.id.btn_done);
-          btnDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              EditText textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
-              EditText textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
-              if(textNewItemName.getText()!= null){
-                Note note = new Note();
-                note.setName(textNewItemName.getText().toString());
-                if(!"".equals(textNewItemComments.getText().toString())){
-                  note.setComments(textNewItemComments.getText().toString());
-                }
-                todoList.getNotes().add(note);
-                adapterTodo.notifyDataSetChanged();
-                popupWindow.dismiss();
-                todoDatabaseHelper.updateTodoList(todoList);
-              }
-            }
-          });
-
+          openPopup(null);
         }
       });
     }
-
   }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    unregisterReceiver(receiverRefreshNotes);
+    unregisterReceiver(receiverUpdateNote);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    registerReceiver(receiverRefreshNotes, new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateNote, new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
+  }
+
+  private void openPopup(@Nullable Note existingNote){
+    LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+    final View view = inflater.inflate(R.layout.popup_new_item,null);
+    final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
+    popupWindow.setContentView(view);
+    popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
+
+    if(existingNote!=null){
+      textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
+      textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
+      textNewItemName.setText(existingNote.getName());
+      textNewItemComments.setText(existingNote.getComments());
+    }
+
+    Button btnCancel = (Button) view.findViewById(R.id.btn_cancel);
+    btnCancel.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        popupWindow.dismiss();
+      }
+    });
+
+    Button btnDone = (Button) view.findViewById(R.id.btn_done);
+    btnDone.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if(textNewItemName.getText()!= null){
+          textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
+          textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
+          Note note = new Note();
+          note.setName(textNewItemName.getText().toString());
+          if(!"".equals(textNewItemComments.getText().toString())){
+            note.setComments(textNewItemComments.getText().toString());
+          }
+          todoList.getNotes().add(note);
+          adapterTodo.notifyDataSetChanged();
+          popupWindow.dismiss();
+          todoDatabaseHelper.updateTodoList(todoList);
+        }
+      }
+    });
+  }
+
+  private BroadcastReceiver receiverRefreshNotes = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      adapterTodo.notifyDataSetChanged();
+      todoDatabaseHelper.updateTodoList(todoList);
+    }
+  };
+
+  private BroadcastReceiver receiverUpdateNote = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      Note note = intent.getParcelableExtra("ExistingNote");
+      openPopup(note);
+    }
+  };
+
 }
