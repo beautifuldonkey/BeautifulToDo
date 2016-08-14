@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
           Intent intent = new Intent(context,TodoActivity.class);
           intent.putExtra(TodoConstants.INTENT_EXTRA_LIST,selectedList);
           startActivityForResult(intent,TodoConstants.INTENT_OPEN_LIST);
+          unregisterReceiver(receiverRefreshLists);
+          unregisterReceiver(receiverUpdateTodoList);
         }
       });
     }
@@ -84,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
   @Override
   protected void onResume() {
     super.onResume();
+    registerReceiver(receiverRefreshLists,new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateTodoList,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
     updateTodoLists();
   }
 
