@@ -34,11 +34,11 @@ public class AdapterManager {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.item_note,null);
 
-        TextView textNoteName = (TextView) view.findViewById(R.id.text_note_name);
+        TextView textNoteName = (TextView) view.findViewById(R.id.text_name);
         textNoteName.setText(currentNote.getName());
         textNoteName.setTextColor(Color.BLACK);
 
-        TextView textNoteComments = (TextView) view.findViewById(R.id.text_note_comments);
+        TextView textNoteComments = (TextView) view.findViewById(R.id.text_comments);
         textNoteComments.setText(currentNote.getComments());
         textNoteComments.setTextColor(Color.BLACK);
 
@@ -57,11 +57,11 @@ public class AdapterManager {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.item_note_list,null);
 
-        TextView textListName = (TextView) view.findViewById(R.id.list_name);
+        TextView textListName = (TextView) view.findViewById(R.id.text_name);
         textListName.setText(currentList.getName());
         textListName.setTextColor(Color.BLACK);
 
-        Button btnDeleteList = (Button) view.findViewById(R.id.btn_remove_list);
+        Button btnDeleteList = (Button) view.findViewById(R.id.btn_remove);
         btnDeleteList.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
@@ -72,7 +72,7 @@ public class AdapterManager {
           }
         });
 
-        ImageButton btnUpdateList = (ImageButton) view.findViewById(R.id.btn_edit_list);
+        ImageButton btnUpdateList = (ImageButton) view.findViewById(R.id.btn_edit);
         btnUpdateList.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {

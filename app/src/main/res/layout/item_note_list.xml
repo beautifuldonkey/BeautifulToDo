@@ -9,23 +9,22 @@
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/list_name"/>
+    android:id="@+id/text_name"/>
 
   <ImageButton
     android:layout_width="40dp"
     android:layout_height="40dp"
-    android:id="@+id/btn_edit_list"
+    android:id="@+id/btn_edit"
     android:focusableInTouchMode="true"
     android:layout_marginRight="5dp"
-    android:layout_centerVertical="true"
     android:background="@drawable/item_btn"
     android:src="@drawable/ic_menu_black_24dp"
-    android:layout_toLeftOf="@+id/btn_remove_list"/>
+    android:layout_toLeftOf="@+id/btn_remove"/>
 
   <Button
     android:layout_width="40dp"
     android:layout_height="40dp"
-    android:id="@+id/btn_remove_list"
+    android:id="@+id/btn_remove"
     android:text="X"
     android:focusable="false"
     android:layout_alignParentRight="true"

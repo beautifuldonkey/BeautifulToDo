@@ -54,7 +54,7 @@ public class TodoActivity extends AppCompatActivity {
           if(initialItemHeight==null){
             initialItemHeight = view.getHeight();
           }
-          TextView textComments = (TextView) view.findViewById(R.id.text_note_comments);
+          TextView textComments = (TextView) view.findViewById(R.id.text_comments);
           if(textComments.getVisibility()==View.INVISIBLE){
             textComments.setVisibility(View.VISIBLE);
             view.setMinimumHeight(initialItemHeight+50);
