@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import beautifuldonkey.beautifultodo.adapters.AdapterManager;
 import beautifuldonkey.beautifultodo.data.Note;
@@ -33,6 +34,7 @@ public class TodoActivity extends AppCompatActivity {
   ListView listTodoItems;
   NoteList todoList;
   TodoDatabaseHelper todoDatabaseHelper;
+  String existingNoteName;
 
   EditText textNewItemName;
   EditText textNewItemComments;
@@ -101,17 +103,19 @@ public class TodoActivity extends AppCompatActivity {
     registerReceiver(receiverUpdateNote, new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
   }
 
-  private void openPopup(@Nullable Note existingNote){
+  private void openPopup(@Nullable final Note existingNote){
     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
     final View view = inflater.inflate(R.layout.popup_new_item,null);
     final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
     popupWindow.setContentView(view);
     popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
 
+    textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
+    textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
+
     if(existingNote!=null){
-      textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
-      textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
-      textNewItemName.setText(existingNote.getName());
+      existingNoteName = existingNote.getName();
+      textNewItemName.setText(existingNoteName);
       textNewItemComments.setText(existingNote.getComments());
     }
 
@@ -127,19 +131,27 @@ public class TodoActivity extends AppCompatActivity {
     btnDone.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if(textNewItemName.getText()!= null){
-          textNewItemName = (EditText) view.findViewById(R.id.new_note_name);
-          textNewItemComments = (EditText) view.findViewById(R.id.new_note_comments);
-          Note note = new Note();
-          note.setName(textNewItemName.getText().toString());
-          if(!"".equals(textNewItemComments.getText().toString())){
-            note.setComments(textNewItemComments.getText().toString());
+
+        Note note = new Note();
+        note.setName(textNewItemName.getText().toString());
+
+        if(!"".equals(textNewItemComments.getText().toString())){
+          note.setComments(textNewItemComments.getText().toString());
+
+          int keyLocation = todoList.getNotes().indexOf(existingNote);
+
+          if(keyLocation == -1 || todoList.getNotes().remove(keyLocation) == null){
+            Toast.makeText(context,"note not removed",Toast.LENGTH_SHORT).show();
           }
-          todoList.getNotes().add(note);
-          adapterTodo.notifyDataSetChanged();
-          popupWindow.dismiss();
-          todoDatabaseHelper.updateTodoList(todoList);
         }
+
+
+        if(!updateTodoNotes(existingNote,note)){
+          Toast.makeText(context,"note list note updated",Toast.LENGTH_SHORT).show();
+        }
+
+        adapterTodo.notifyDataSetChanged();
+        popupWindow.dismiss();
       }
     });
   }
@@ -159,5 +171,14 @@ public class TodoActivity extends AppCompatActivity {
       openPopup(note);
     }
   };
+
+  private Boolean updateTodoNotes(@Nullable Note existingNote, Note newNote){
+    Boolean updateSuccessful = false;
+
+    todoList.getNotes().add(newNote);
+    todoDatabaseHelper.updateTodoList(todoList);
+
+    return updateSuccessful;
+  }
 
 }
