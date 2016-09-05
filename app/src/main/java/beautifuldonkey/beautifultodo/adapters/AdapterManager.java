@@ -58,6 +58,7 @@ public class AdapterManager {
           public void onClick(View v) {
             Intent intent = new Intent(TodoConstants.INTENT_EXTRA_UPDATE_LIST);
             intent.putExtra("ExistingNote", notes.get(position));
+            intent.putExtra("ExistingNotePosition",String.valueOf(position));
             context.sendBroadcast(intent);
           }
         });

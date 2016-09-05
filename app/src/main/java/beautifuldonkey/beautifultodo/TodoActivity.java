@@ -17,8 +17,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import beautifuldonkey.beautifultodo.adapters.AdapterManager;
 import beautifuldonkey.beautifultodo.data.Note;
 import beautifuldonkey.beautifultodo.data.NoteList;
@@ -83,7 +81,7 @@ public class TodoActivity extends AppCompatActivity {
       btnAddItem.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          openPopup(null);
+          openPopup(null,null);
         }
       });
     }
@@ -103,7 +101,7 @@ public class TodoActivity extends AppCompatActivity {
     registerReceiver(receiverUpdateNote, new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
   }
 
-  private void openPopup(@Nullable final Note existingNote){
+  private void openPopup(@Nullable final Note existingNote, @Nullable final String existingNotePos){
     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
     final View view = inflater.inflate(R.layout.popup_new_item,null);
     final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
@@ -137,21 +135,18 @@ public class TodoActivity extends AppCompatActivity {
 
         if(!"".equals(textNewItemComments.getText().toString())){
           note.setComments(textNewItemComments.getText().toString());
-
-          int keyLocation = todoList.getNotes().indexOf(existingNote);
-
-          if(keyLocation == -1 || todoList.getNotes().remove(keyLocation) == null){
-            Toast.makeText(context,"note not removed",Toast.LENGTH_SHORT).show();
-          }
         }
 
-
-        if(!updateTodoNotes(existingNote,note)){
-          Toast.makeText(context,"note list note updated",Toast.LENGTH_SHORT).show();
+        if(existingNotePos!=null){
+          int pos = Integer.valueOf(existingNotePos);
+          todoList.getNotes().get(pos).setName(note.getName());
+          todoList.getNotes().get(pos).setComments(note.getComments());
+        }else{
+          todoList.getNotes().add(note);
         }
-
         adapterTodo.notifyDataSetChanged();
         popupWindow.dismiss();
+        todoDatabaseHelper.updateTodoList(todoList);
       }
     });
   }
@@ -168,17 +163,8 @@ public class TodoActivity extends AppCompatActivity {
     @Override
     public void onReceive(Context context, Intent intent) {
       Note note = intent.getParcelableExtra("ExistingNote");
-      openPopup(note);
+      String notePos = intent.getStringExtra("ExistingNotePosition");
+      openPopup(note,notePos);
     }
   };
-
-  private Boolean updateTodoNotes(@Nullable Note existingNote, Note newNote){
-    Boolean updateSuccessful = false;
-
-    todoList.getNotes().add(newNote);
-    todoDatabaseHelper.updateTodoList(todoList);
-
-    return updateSuccessful;
-  }
-
 }
