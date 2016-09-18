@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -103,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
 
     newListView = inflater.inflate(R.layout.popup_new_list,null);
     popupWindow = new PopupWindow(newListView,300,500,true);
+    if(Build.VERSION.SDK_INT >= 21){
+      popupWindow.setElevation(20);
+    }
     popupWindow.setContentView(newListView);
     popupWindow.showAtLocation(btnAddList, Gravity.CENTER,0,0);
 

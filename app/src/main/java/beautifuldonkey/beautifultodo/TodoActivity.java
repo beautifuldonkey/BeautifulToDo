@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -105,6 +106,9 @@ public class TodoActivity extends AppCompatActivity {
     LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
     final View view = inflater.inflate(R.layout.popup_new_item,null);
     final PopupWindow popupWindow = new PopupWindow(view,400,800,true);
+    if(Build.VERSION.SDK_INT >= 21){
+      popupWindow.setElevation(20);
+    }
     popupWindow.setContentView(view);
     popupWindow.showAtLocation(btnAddItem, Gravity.CENTER,0,0);
 
