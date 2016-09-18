@@ -8,4 +8,12 @@
     <item name="colorAccent">@color/colorAccent</item>
   </style>
 
+  <style name="DefaultPopup">
+    <item name="android:background">@color/popupBackground</item>
+    <item name="android:shadowColor">@color/popupShadow</item>
+    <item name="android:shadowDx">2</item>
+    <item name="android:shadowDy">2</item>
+    <item name="android:shadowRadius">2</item>
+  </style>
+
 </resources>
