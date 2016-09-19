@@ -8,4 +8,6 @@ public class TodoConstants {
   public static int INTENT_OPEN_LIST = 0;
 
   public static String INTENT_EXTRA_LIST = "NoteList";
+  public static String INTENT_EXTRA_REFRESH_LIST = "RefreshTodoLists";
+  public static String INTENT_EXTRA_UPDATE_LIST = "UpdateTodoLists";
 }

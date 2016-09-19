@@ -1,7 +1,11 @@
 package beautifuldonkey.beautifultodo;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -10,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
   TodoDatabaseHelper todoDatabaseHelper;
   View newListView;
   PopupWindow popupWindow;
+  String existingName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
     lists = new ArrayList<>();
     todoDatabaseHelper = new TodoDatabaseHelper(this);
+    registerReceiver(receiverRefreshLists,new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateTodoList,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
 
     if(todoDatabaseHelper.getTodoListCount()>0){
       lists = todoDatabaseHelper.getAllTodoLists();
@@ -58,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
           Intent intent = new Intent(context,TodoActivity.class);
           intent.putExtra(TodoConstants.INTENT_EXTRA_LIST,selectedList);
           startActivityForResult(intent,TodoConstants.INTENT_OPEN_LIST);
+          unregisterReceiver(receiverRefreshLists);
+          unregisterReceiver(receiverUpdateTodoList);
         }
       });
     }
@@ -67,45 +77,7 @@ public class MainActivity extends AppCompatActivity {
       btnAddList.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-          newList = new NoteList();
-
-          newListView = inflater.inflate(R.layout.popup_new_list,null);
-          popupWindow = new PopupWindow(newListView,300,500,true);
-          popupWindow.setContentView(newListView);
-          popupWindow.showAtLocation(btnAddList, Gravity.CENTER,0,0);
-
-          Button btnDoneListName = (Button) newListView.findViewById(R.id.btn_new_list_name);
-          btnDoneListName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              TextView textListName = (TextView) newListView.findViewById(R.id.new_list_name);
-              if(textListName.getText().length()>0){
-                newList.setName(textListName.getText().toString());
-                todoDatabaseHelper.addTodoList(newList);
-                List<NoteList> existingNoteLists = new ArrayList<>();
-                if(lists.size()>0){
-                  existingNoteLists.addAll(lists.subList(0,lists.size()));
-                }
-                existingNoteLists.add(newList);
-                lists.clear();
-                lists.addAll(existingNoteLists);
-                noteListAdapter.notifyDataSetChanged();
-                popupWindow.dismiss();
-              }else{
-                Toast.makeText(context,"Please enter a name for this list",Toast.LENGTH_SHORT).show();
-              }
-            }
-          });
-
-          Button btnCancel = (Button) newListView.findViewById(R.id.btn_cancel);
-          btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              popupWindow.dismiss();
-            }
-          });
+          openPopup(null);
         }
       });
     }
@@ -113,14 +85,81 @@ public class MainActivity extends AppCompatActivity {
   }
 
   @Override
-    protected void onResume() {
-      super.onResume();
-      List<NoteList> todoLists = new ArrayList<>();
-      if(todoDatabaseHelper.getTodoListCount()>0){
-        todoLists = todoDatabaseHelper.getAllTodoLists();
+  protected void onResume() {
+    super.onResume();
+    registerReceiver(receiverRefreshLists,new IntentFilter(TodoConstants.INTENT_EXTRA_REFRESH_LIST));
+    registerReceiver(receiverUpdateTodoList,new IntentFilter(TodoConstants.INTENT_EXTRA_UPDATE_LIST));
+    updateTodoLists();
+  }
+
+  private void openPopup(@Nullable final NoteList listToUpdate){
+    LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    newList = new NoteList();
+
+    existingName = "";
+    if(listToUpdate!=null){
+      newList = listToUpdate;
+      existingName = listToUpdate.getName();
+    }
+
+    newListView = inflater.inflate(R.layout.popup_new_list,null);
+    popupWindow = new PopupWindow(newListView,300,500,true);
+    if(Build.VERSION.SDK_INT >= 21){
+      popupWindow.setElevation(20);
+    }
+    popupWindow.setContentView(newListView);
+    popupWindow.showAtLocation(btnAddList, Gravity.CENTER,0,0);
+
+    Button btnDoneListName = (Button) newListView.findViewById(R.id.btn_new_list_name);
+    btnDoneListName.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        TextView textListName = (TextView) newListView.findViewById(R.id.new_list_name);
+        if(textListName.getText().length()>0){
+          newList.setName(textListName.getText().toString());
+          if(listToUpdate!=null){
+            todoDatabaseHelper.deleteTodoList(existingName);
+          }
+          todoDatabaseHelper.addTodoList(newList);
+          updateTodoLists();
+          popupWindow.dismiss();
+        }else{
+          Toast.makeText(context,"Please enter a name for this list",Toast.LENGTH_SHORT).show();
+        }
       }
-      lists.clear();
-      lists.addAll(todoLists);
-      noteListAdapter.notifyDataSetChanged();
+    });
+
+    Button btnCancel = (Button) newListView.findViewById(R.id.btn_cancel);
+    btnCancel.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        popupWindow.dismiss();
+      }
+    });
+  }
+
+  private BroadcastReceiver receiverRefreshLists = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      updateTodoLists();
+    }
+  };
+
+  private BroadcastReceiver receiverUpdateTodoList = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      NoteList listToUpdate = intent.getParcelableExtra("ExistingNote");
+      openPopup(listToUpdate);
+    }
+  };
+
+  private void updateTodoLists(){
+    List<NoteList> todoLists = new ArrayList<>();
+    if(todoDatabaseHelper.getTodoListCount()>0){
+      todoLists = todoDatabaseHelper.getAllTodoLists();
+    }
+    lists.clear();
+    lists.addAll(todoLists);
+    noteListAdapter.notifyDataSetChanged();
   }
 }
