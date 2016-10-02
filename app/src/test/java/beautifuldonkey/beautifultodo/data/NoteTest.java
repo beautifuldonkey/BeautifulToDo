@@ -47,7 +47,6 @@ public class NoteTest {
   }
 
   @Test
-
   public void testNoteParcelableArray(){
     Note[] testNoteArray = Note.CREATOR.newArray(1);
     assertNotNull(testNoteArray);
