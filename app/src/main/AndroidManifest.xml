@@ -17,6 +17,8 @@
     </activity>
     <activity android:name=".TodoActivity">
     </activity>
+    <activity android:name=".StyleActivity">
+    </activity>
   </application>
 
 </manifest>

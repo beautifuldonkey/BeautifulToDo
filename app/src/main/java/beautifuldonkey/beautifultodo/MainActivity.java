@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
   List<NoteList> lists;
   ArrayAdapter<NoteList> noteListAdapter;
   Button btnAddList;
+  Button btnStyle;
   NoteList newList;
   TodoDatabaseHelper todoDatabaseHelper;
   View newListView;
@@ -78,6 +79,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
           openPopup(null);
+        }
+      });
+    }
+
+    btnStyle = (Button) findViewById(R.id.btn_style);
+    if(btnStyle != null){
+      btnStyle.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Intent intent = new Intent(context,StyleActivity.class);
+          startActivityForResult(intent,TodoConstants.INTENT_OPEN_STYLE);
         }
       });
     }

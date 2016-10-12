@@ -6,6 +6,7 @@ package beautifuldonkey.beautifultodo.data;
  */
 public class TodoConstants {
   public static int INTENT_OPEN_LIST = 0;
+  public static int INTENT_OPEN_STYLE = 1;
 
   public static String INTENT_EXTRA_LIST = "NoteList";
   public static String INTENT_EXTRA_REFRESH_LIST = "RefreshTodoLists";

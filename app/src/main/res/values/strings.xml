@@ -4,6 +4,7 @@
   <string name="btn_add_list">Add List</string>
   <string name="btn_cancel">Cancel</string>
   <string name="btn_done">Done</string>
+  <string name="btn_style">Style</string>
   <string name="new_list_name">New List Name</string>
   <string name="new_note_comments">Comments..</string>
   <string name="new_note_name">New Note Name</string>
