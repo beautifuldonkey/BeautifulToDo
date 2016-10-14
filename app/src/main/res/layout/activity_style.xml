@@ -11,4 +11,43 @@
   android:paddingTop="@dimen/activity_vertical_margin"
   tools:context="beautifuldonkey.beautifultodo.StyleActivity">
 
+  <RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/btn_subtract"
+      android:text="@string/btn_subtract"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentStart="true"/>
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/text_size_label"
+      android:text="@string/label_text_size"
+      android:layout_centerVertical="true"
+      android:layout_toRightOf="@+id/btn_subtract"
+      android:layout_toEndOf="@+id/btn_subtract"/>
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/text_size"
+      android:layout_centerVertical="true"
+      android:layout_toRightOf="@+id/text_size_label"
+      android:layout_toEndOf="@+id/text_size_label"/>
+
+    <Button
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/btn_add"
+      android:text="@string/btn_add"
+      android:layout_toRightOf="@+id/text_size"
+      android:layout_toEndOf="@+id/text_size"/>
+
+  </RelativeLayout>
+
+
 </RelativeLayout>
